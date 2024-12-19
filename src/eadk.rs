@@ -11,7 +11,7 @@ impl Color {
         let g = (g / 255 * 0b111111) as u16;
         let b = (b / 255 * 0b11111) as u16;
         Color {
-            rgb565: (r << 11) & (g << 5) & b,
+            rgb565: (r << 11) | (g << 5) | b,
         }
     }
     /// get red color component (5 bits)
@@ -420,7 +420,7 @@ fn panic(_panic: &PanicInfo<'_>) -> ! {
             width: 320,
             height: 240,
         },
-        Color::from_rgb(255, 0, 0),
+        Color :: from_rgb(255, 0, 0),
     );
     loop {}
 }
