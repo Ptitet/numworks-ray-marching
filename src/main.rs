@@ -45,7 +45,7 @@ pub fn main() {
         sphere,
     };
     scene.render(50, &mut buff);
-    // buff.render();
+    buff.render();
 
     // hang when finished
     loop {}
