@@ -30,29 +30,23 @@ pub fn main() {
     buff.clear(Color::from_rgb(255, 255, 255));
     buff.render();
 
-    buff.clear(Color::from_rgb(0, 0, 0));
-    buff.render();
-
     let camera = Camera {
-        position: Vec3::new(0., 0., -10.),
-        focal_length: 3.,
+        position: Vec3::new(0., 0., 0.),
+        focal_length: 1.,
     };
     let sphere = Sphere {
-        color: Color::from_rgb(255, 50, 100),
-        position: Vec3::new(0., 0., 2.),
+        color: Color::from_rgb(255, 0, 0),
+        position: Vec3::new(0., 0., 5.),
         radius: 2.,
     };
     let scene = Scene {
         camera,
-        background_color: Color::from_rgb(50, 100, 255),
+        background_color: Color::from_rgb(0, 50, 0),
         sphere,
     };
     scene.render(50, &mut buff);
-    buff.render();
-
-    buff.clear(Color::from_rgb(0, 255, 0));
-    buff.render();
+    // buff.render();
 
     // hang when finished
-    // loop {}
+    loop {}
 }
