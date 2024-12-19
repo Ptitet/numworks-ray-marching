@@ -1,89 +1,4 @@
-use core::ops::{Add, Mul, Sub};
-
-use trigo::{cos, sin};
-
-//// list object
-// i cant bc i need to do unsafe things (which mean memory leak)
-
-/// 2-dimentional vector (integers)
-#[derive(Default, Clone, Copy)]
-pub struct Vec2i {
-    pub x: i32,
-    pub y: i32,
-}
-
-/// element-wise multiplication (by integer)
-impl Mul<i32> for Vec2i {
-    type Output = Self;
-    fn mul(self, rhs: i32) -> Self::Output {
-        Vec2i {
-            x: self.x * rhs,
-            y: self.y * rhs,
-        }
-    }
-}
-
-/// element-wise multiplication (by float)
-impl Mul<f32> for Vec2i {
-    type Output = Vec2;
-    fn mul(self, rhs: f32) -> Self::Output {
-        Vec2 {
-            x: self.x as f32 * rhs,
-            y: self.y as f32 * rhs,
-        }
-    }
-}
-
-/// element-wise addition
-impl Add<Vec2i> for Vec2i {
-    type Output = Self;
-    fn add(self, rhs: Vec2i) -> Self::Output {
-        Vec2i {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-        }
-    }
-}
-
-/// element-wise substraction
-impl Sub<Vec2i> for Vec2i {
-    type Output = Self;
-    fn sub(self, rhs: Vec2i) -> Self::Output {
-        Vec2i {
-            x: self.x - rhs.x,
-            y: self.y - rhs.y,
-        }
-    }
-}
-
-impl Vec2i {
-    /// get the norm (or the length) of the vector
-    pub fn norm(self) -> f32 {
-        sqrt((self.x * self.x + self.y * self.y) as f32)
-    }
-
-    /// return a normalized copy of the vector
-    pub fn normalized(self) -> Vec2 {
-        let inv_sqrt_norm = inv_sqrt((self.x * self.x + self.y * self.y) as f32);
-        Vec2 {
-            x: self.x as f32 * inv_sqrt_norm,
-            y: self.y as f32 * inv_sqrt_norm,
-        }
-    }
-
-    /// return the dot product of the vectors
-    pub fn dot(self, other: Self) -> i32 {
-        self.x * other.x + self.y * other.y
-    }
-
-    /// save vector with floats
-    pub fn to_float(self) -> Vec2 {
-        Vec2 {
-            x: self.x as f32,
-            y: self.y as f32,
-        }
-    }
-}
+use core::ops::{Add, AddAssign, Div, Mul, Sub};
 
 /// 2-dimensional vector (floats)
 #[derive(Default, Clone, Copy)]
@@ -92,42 +7,49 @@ pub struct Vec2 {
     pub y: f32,
 }
 
-/// element-wise multiplication
+impl Add for Vec2 {
+    type Output = Self;
+    fn add(self, rhs: Self) -> Self::Output {
+        let x = self.x + rhs.x;
+        let y = self.y + rhs.y;
+        Vec2::new(x, y)
+    }
+}
+
+impl Sub for Vec2 {
+    type Output = Self;
+    fn sub(self, rhs: Self) -> Self::Output {
+        let x = self.x - rhs.x;
+        let y = self.y - rhs.y;
+        Vec2::new(x, y)
+    }
+}
+
 impl Mul<f32> for Vec2 {
     type Output = Self;
     fn mul(self, rhs: f32) -> Self::Output {
-        Vec2 {
-            x: self.x * rhs,
-            y: self.y * rhs,
-        }
+        let x = self.x * rhs;
+        let y = self.y * rhs;
+        Vec2::new(x, y)
     }
 }
 
-/// element-wise addition
-impl Add<Vec2> for Vec2 {
+impl Div<f32> for Vec2 {
     type Output = Self;
-    fn add(self, rhs: Vec2) -> Self::Output {
-        Vec2 {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-        }
-    }
-}
-
-/// element-wise substraction
-impl Sub<Vec2> for Vec2 {
-    type Output = Self;
-    fn sub(self, rhs: Vec2) -> Self::Output {
-        Vec2 {
-            x: self.x - rhs.x,
-            y: self.y - rhs.y,
-        }
+    fn div(self, rhs: f32) -> Self::Output {
+        let x = self.x / rhs;
+        let y = self.y / rhs;
+        Vec2::new(x, y)
     }
 }
 
 impl Vec2 {
+    pub fn new(x: f32, y: f32) -> Self {
+        Vec2 { x, y }
+    }
+
     /// get the norm (or the length) of the vector
-    pub fn norm(self) -> f32 {
+    pub fn magnitude(self) -> f32 {
         sqrt(self.x * self.x + self.y * self.y)
     }
 
@@ -140,30 +62,10 @@ impl Vec2 {
 
     /// return a normalized copy of the vector
     pub fn normalized(self) -> Self {
-        let inv_sqrt_norm = inv_sqrt(self.norm());
+        let inv_sqrt_norm = inv_sqrt(self.magnitude());
         Vec2 {
             x: self.x * inv_sqrt_norm,
             y: self.y * inv_sqrt_norm,
-        }
-    }
-
-    /// rotate the vector
-    pub fn rotate(&mut self, angle: f32) {
-        let cosx = cos(angle);
-        let sinx = sin(angle);
-        let x = self.x * cosx - self.y * sinx;
-        let y = self.x * sinx + self.y * cosx;
-        self.x = x;
-        self.y = y;
-    }
-
-    /// return a normalized copy of the vector
-    pub fn rotated(self, angle: f32) -> Self {
-        let cosx = cos(angle);
-        let sinx = sin(angle);
-        Vec2 {
-            x: self.x * cosx - self.y * sinx,
-            y: self.x * sinx + self.y * cosx,
         }
     }
 
@@ -176,28 +78,100 @@ impl Vec2 {
     pub fn lerp(self, target: Self, t: f32) -> Self {
         self + (target - self) * t
     }
+}
 
-    /// get the angle from the vector to (1, 0)
-    pub fn get_angle(&self) -> f32 {
-        unimplemented!()
+/// 3-dimensional vector (floats)
+#[derive(Default, Clone, Copy)]
+pub struct Vec3 {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+}
+
+impl Add for Vec3 {
+    type Output = Self;
+    fn add(self, rhs: Self) -> Self::Output {
+        let x = self.x + rhs.x;
+        let y = self.y + rhs.y;
+        let z = self.z + rhs.z;
+        Vec3::new(x, y, z)
+    }
+}
+
+impl AddAssign for Vec3 {
+    fn add_assign(&mut self, rhs: Self) {
+        self.x += rhs.x;
+        self.y += rhs.y;
+        self.z += rhs.z;
+    }
+}
+
+impl Sub for Vec3 {
+    type Output = Self;
+    fn sub(self, rhs: Self) -> Self::Output {
+        let x = self.x - rhs.x;
+        let y = self.y - rhs.y;
+        let z = self.z - rhs.z;
+        Vec3::new(x, y, z)
+    }
+}
+
+impl Mul<f32> for Vec3 {
+    type Output = Self;
+    fn mul(self, rhs: f32) -> Self::Output {
+        let x = self.x * rhs;
+        let y = self.y * rhs;
+        let z = self.z * rhs;
+        Vec3::new(x, y, z)
+    }
+}
+
+impl Div<f32> for Vec3 {
+    type Output = Self;
+    fn div(self, rhs: f32) -> Self::Output {
+        let x = self.x / rhs;
+        let y = self.y / rhs;
+        let z = self.z / rhs;
+        Vec3::new(x, y, z)
+    }
+}
+
+impl Vec3 {
+    pub fn new(x: f32, y: f32, z: f32) -> Self {
+        Vec3 { x, y, z }
     }
 
-    /// tangent angle
-    pub fn tan_angle(&self) -> f32 {
-        self.y / self.x
+    /// get the norm (or the length) of the vector
+    pub fn magnitude(self) -> f32 {
+        sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
     }
 
-    /// inverse tangent angle
-    pub fn inv_tan_angle(&self) -> f32 {
-        self.x / self.y
+    /// normalize the vector
+    pub fn normalize(&mut self) {
+        let inv_sqrt_norm = inv_sqrt(self.x * self.x + self.y * self.y + self.z * self.z);
+        self.x = self.x * inv_sqrt_norm;
+        self.y = self.y * inv_sqrt_norm;
+        self.z = self.z * inv_sqrt_norm;
     }
 
-    /// floor each component
-    pub fn floor(&self) -> Vec2i {
-        Vec2i {
-            x: self.x as i32,
-            y: self.y as i32,
+    /// return a normalized copy of the vector
+    pub fn normalized(self) -> Self {
+        let inv_sqrt_norm = inv_sqrt(self.magnitude());
+        Vec3 {
+            x: self.x * inv_sqrt_norm,
+            y: self.y * inv_sqrt_norm,
+            z: self.z * inv_sqrt_norm,
         }
+    }
+
+    /// return the dot product of the vectors
+    pub fn dot(self, other: Self) -> f32 {
+        self.x * other.x + self.y * other.y + self.z * other.z
+    }
+
+    /// return a new vector linearly interpolated to a target vector
+    pub fn lerp(self, target: Self, t: f32) -> Self {
+        self + (target - self) * t
     }
 }
 
@@ -265,23 +239,5 @@ pub mod trigo {
         } else {
             -1. / (0.636 * x - f32::consts::FRAC_2_PI) - f32::consts::FRAC_PI_2
         }
-    }
-}
-
-/// step function (range [0, 1])
-pub fn step(x: f32, threshold: f32) -> f32 {
-    if x < threshold {
-        0.
-    } else {
-        1.
-    }
-}
-
-/// step function (range [-1, 1])
-pub fn large_step(x: f32, threshold: f32) -> f32 {
-    if x < threshold {
-        -1.
-    } else {
-        1.
     }
 }
