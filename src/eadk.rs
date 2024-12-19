@@ -99,7 +99,7 @@ pub mod display {
     pub const SCREEN_WIDTH: u16 = 320;
     pub const SCREEN_HEIGHT: u16 = 240;
     pub const RATIO: f32 = 320. / 240.;
-    pub const HALF_RATIO: f32 = 320. / 120.;
+    pub const HALF_RATIO: f32 = 320. / (240. * 2.);
 
     pub fn push_rect(rect: Rect, pixels: &[Color]) {
         unsafe {
