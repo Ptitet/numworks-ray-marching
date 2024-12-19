@@ -420,7 +420,7 @@ fn panic(_panic: &PanicInfo<'_>) -> ! {
             width: 320,
             height: 240,
         },
-        Color { rgb565: 0xF800 },
+        Color::from_rgb(255, 0, 0),
     );
     loop {}
 }
