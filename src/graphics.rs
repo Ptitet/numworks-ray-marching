@@ -65,9 +65,7 @@ impl Buffer {
         }
     }
 
-    /// draws the buffer to the screen
-    pub fn render(&self) {
-        wait_for_vblank();
+    fn render_on_screen(&self) {
         push_rect(
             Rect {
                 x: 0,
@@ -77,6 +75,16 @@ impl Buffer {
             },
             &self.data,
         )
+    }
+
+    /// draws the buffer to the screen
+    pub fn render(&self) {
+        wait_for_vblank();
+        self.render_on_screen();
+    }
+
+    pub fn fast_render(&self) {
+        self.render_on_screen();
     }
 
     /// draws a line
