@@ -49,14 +49,14 @@ impl Camera {
     }
 }
 
-pub struct Scene {
-    pub spheres: [Sphere; 3],
+pub struct Scene<const N: usize> {
+    pub spheres: [Sphere; N],
     pub camera: Camera,
     pub background_color: Color,
-    pub light: Light,
+    // pub light: Light,
 }
 
-impl Scene {
+impl<const N: usize> Scene<N> {
     fn march_radius_at(&self, position: Vec3) -> (f32, Sphere) {
         let mut min_distance = f32::MAX;
         let mut closest_sphere = self.spheres[0];
